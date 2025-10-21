@@ -253,6 +253,10 @@ function initializeInterpreterToggles(): void {
 	initializeSettingToggle('interpreter-auto-run-toggle', generalSettings.interpreterAutoRun, (checked) => {
 		saveSettings({ ...generalSettings, interpreterAutoRun: checked });
 	});
+
+	initializeSettingToggle('interpreter-rate-limit-toggle', generalSettings.interpreterRateLimitEnabled, (checked) => {
+		saveSettings({ ...generalSettings, interpreterRateLimitEnabled: checked });
+	});
 }
 
 function initializeProviderList() {

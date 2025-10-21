@@ -35,7 +35,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 	}
 
 	const now = Date.now();
-	if (now - lastRequestTime < RATE_LIMIT_RESET_TIME) {
+	if (generalSettings.interpreterRateLimitEnabled && now - lastRequestTime < RATE_LIMIT_RESET_TIME) {
 		throw new Error(`Rate limit cooldown. Please wait ${Math.ceil((RATE_LIMIT_RESET_TIME - (now - lastRequestTime)) / 1000)} seconds before trying again.`);
 	}
 

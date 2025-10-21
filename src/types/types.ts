@@ -82,6 +82,7 @@ export interface Settings {
 	providers: Provider[];
 	interpreterEnabled: boolean;
 	interpreterAutoRun: boolean;
+	interpreterRateLimitEnabled: boolean;
 	defaultPromptContext: string;
 	propertyTypes: PropertyType[];
 	readerSettings: ReaderSettings;

@@ -389,8 +389,19 @@
 									</div>
 								</div>
 							</div>
-							<div>
-								<h3 data-i18n="providers">Providers</h3>
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+									<label for="interpreter-rate-limit-toggle" data-i18n="interpreterRateLimit">Enable rate limiting</label>
+									<div class="setting-item-description" data-i18n="interpreterRateLimitDescription">Prevent sending requests more than once per minute. Turn off to allow unlimited requests.</div>
+								</div>
+								<div class="setting-item-control">
+									<div class="checkbox-container">
+										<input type="checkbox" id="interpreter-rate-limit-toggle" />
+									</div>
+								</div>
+							</div>
+						<div>
+							<h3 data-i18n="providers">Providers</h3>
 								<div id="api-keys-warning-container" class="warning-container" style="margin-bottom: 0.5rem;">
 									<div class="warning-icon">
 										<i data-lucide="alert-triangle"></i>

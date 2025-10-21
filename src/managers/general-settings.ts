@@ -18,6 +18,7 @@ import { getClipHistory } from '../utils/storage-utils';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { showModal, hideModal } from '../utils/modal-utils';
+import { testLocalRestApiConnection } from '../utils/local-rest-api';
 
 dayjs.extend(weekOfYear);
 
@@ -216,6 +217,10 @@ export function initializeGeneralSettings(): void {
 		initializeBetaFeaturesToggle();
 		initializeLegacyModeToggle();
 		initializeSilentOpenToggle();
+		initializeLocalRestApiToggle();
+		initializeLocalRestApiUrl();
+		initializeLocalRestApiKey();
+		initializeLocalRestApiTestButton();
 		initializeVaultInput();
 		initializeOpenBehaviorDropdown();
 		initializeKeyboardShortcuts();
@@ -342,6 +347,82 @@ function initializeSilentOpenToggle(): void {
 	initializeSettingToggle('silent-open-toggle', generalSettings.silentOpen, (checked) => {
 		saveSettings({ ...generalSettings, silentOpen: checked });
 	});
+}
+
+function initializeLocalRestApiToggle(): void {
+	const toggle = document.getElementById('local-rest-api-toggle') as HTMLInputElement;
+	const settingsContainer = document.getElementById('local-rest-api-settings');
+
+	if (toggle) {
+		toggle.checked = generalSettings.localRestApiEnabled;
+
+		// Show/hide related settings based on toggle state
+		const toggleRelatedSettings = (show: boolean) => {
+			if (settingsContainer) settingsContainer.style.display = show ? 'block' : 'none';
+		};
+
+		toggleRelatedSettings(generalSettings.localRestApiEnabled);
+
+		toggle.addEventListener('change', () => {
+			saveSettings({ ...generalSettings, localRestApiEnabled: toggle.checked });
+			toggleRelatedSettings(toggle.checked);
+		});
+	}
+}
+
+function initializeLocalRestApiUrl(): void {
+	const input = document.getElementById('local-rest-api-url') as HTMLInputElement;
+	if (input) {
+		input.value = generalSettings.localRestApiUrl || 'http://localhost:27123';
+		input.addEventListener('input', debounce(() => {
+			saveSettings({ ...generalSettings, localRestApiUrl: input.value.trim() });
+		}, 500));
+	}
+}
+
+function initializeLocalRestApiKey(): void {
+	const input = document.getElementById('local-rest-api-key') as HTMLInputElement;
+	if (input) {
+		input.value = generalSettings.localRestApiKey || '';
+		input.addEventListener('input', debounce(() => {
+			saveSettings({ ...generalSettings, localRestApiKey: input.value.trim() });
+		}, 500));
+	}
+}
+
+function initializeLocalRestApiTestButton(): void {
+	const button = document.getElementById('test-local-rest-api-btn');
+	if (button) {
+		button.addEventListener('click', async () => {
+			const originalText = button.textContent;
+			button.textContent = getMessage('testing') || 'Testing...';
+			button.setAttribute('disabled', 'true');
+
+			try {
+				const result = await testLocalRestApiConnection();
+
+				if (result.success) {
+					button.textContent = getMessage('localRestApiTestSuccess') || 'Connection successful!';
+					button.classList.add('mod-success');
+				} else {
+					button.textContent = getMessage('localRestApiTestFailed') || 'Connection failed';
+					button.classList.add('mod-warning');
+					console.error('Local REST API test failed:', result.error);
+					alert(getMessage('localRestApiTestFailedMessage', [result.error || 'Unknown error']) || `Connection failed: ${result.error}`);
+				}
+			} catch (error) {
+				button.textContent = getMessage('localRestApiTestFailed') || 'Connection failed';
+				button.classList.add('mod-warning');
+				console.error('Local REST API test error:', error);
+			}
+
+			setTimeout(() => {
+				button.textContent = originalText;
+				button.removeAttribute('disabled');
+				button.classList.remove('mod-success', 'mod-warning');
+			}, 3000);
+		});
+	}
 }
 
 function initializeOpenBehaviorDropdown(): void {

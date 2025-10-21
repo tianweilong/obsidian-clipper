@@ -766,6 +766,45 @@
 	"silentOpenDescription": {
 		"message": "剪藏的笔记将被保存但不会在新标签页中打开。Obsidian 仍会被置于前台。"
 	},
+	"localRestApiEnabled": {
+		"message": "启用 Local REST API"
+	},
+	"localRestApiDescription": {
+		"message": "使用 Local REST API 插件静默创建笔记。请在 Obsidian 中安装 \"Local REST API\" 插件并在下方配置。这样可以防止 Obsidian 被置于前台。"
+	},
+	"localRestApiUrl": {
+		"message": "API 地址"
+	},
+	"localRestApiUrlDescription": {
+		"message": "Local REST API 服务器地址（默认：http://localhost:27123）"
+	},
+	"localRestApiKey": {
+		"message": "API 密钥"
+	},
+	"localRestApiKeyDescription": {
+		"message": "从 Obsidian 插件设置中获取的 Local REST API 密钥"
+	},
+	"localRestApiTest": {
+		"message": "测试连接"
+	},
+	"localRestApiTestDescription": {
+		"message": "测试 Local REST API 连接是否正常"
+	},
+	"localRestApiTestSuccess": {
+		"message": "连接成功！"
+	},
+	"localRestApiTestFailed": {
+		"message": "连接失败"
+	},
+	"localRestApiTestFailedMessage": {
+		"message": "连接失败：$1"
+	},
+	"testing": {
+		"message": "测试中..."
+	},
+	"testConnection": {
+		"message": "测试连接"
+	},
 	"specificNoteName": {
 		"message": "特定笔记名称"
 	},

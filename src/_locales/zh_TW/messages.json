@@ -763,6 +763,45 @@
 	"silentOpenDescription": {
 		"message": "擷取的筆記將被儲存但不會開啟為新標籤。Obsidian 仍會被提到上層。"
 	},
+	"localRestApiEnabled": {
+		"message": "啟用 Local REST API"
+	},
+	"localRestApiDescription": {
+		"message": "使用 Local REST API 插件靜默建立筆記。請在 Obsidian 中安裝 \"Local REST API\" 插件並在下方配置。這樣可以防止 Obsidian 被提到上層。"
+	},
+	"localRestApiUrl": {
+		"message": "API 位址"
+	},
+	"localRestApiUrlDescription": {
+		"message": "Local REST API 伺服器位址（預設：http://localhost:27123）"
+	},
+	"localRestApiKey": {
+		"message": "API 金鑰"
+	},
+	"localRestApiKeyDescription": {
+		"message": "從 Obsidian 插件設定中取得的 Local REST API 金鑰"
+	},
+	"localRestApiTest": {
+		"message": "測試連線"
+	},
+	"localRestApiTestDescription": {
+		"message": "測試 Local REST API 連線是否正常"
+	},
+	"localRestApiTestSuccess": {
+		"message": "連線成功！"
+	},
+	"localRestApiTestFailed": {
+		"message": "連線失敗"
+	},
+	"localRestApiTestFailedMessage": {
+		"message": "連線失敗：$1"
+	},
+	"testing": {
+		"message": "測試中..."
+	},
+	"testConnection": {
+		"message": "測試連線"
+	},
 	"specificNoteName": {
 		"message": "特定筆記名稱"
 	},

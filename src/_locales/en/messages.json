@@ -766,6 +766,45 @@
 	"silentOpenDescription": {
 		"message": "Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground."
 	},
+	"localRestApiEnabled": {
+		"message": "Enable Local REST API"
+	},
+	"localRestApiDescription": {
+		"message": "Use the Local REST API plugin for silent note creation. Install the \"Local REST API\" plugin in Obsidian and configure it below. This will prevent Obsidian from being brought to the foreground."
+	},
+	"localRestApiUrl": {
+		"message": "API URL"
+	},
+	"localRestApiUrlDescription": {
+		"message": "The URL of your Local REST API server (default: http://localhost:27123)"
+	},
+	"localRestApiKey": {
+		"message": "API Key"
+	},
+	"localRestApiKeyDescription": {
+		"message": "Your Local REST API key from Obsidian plugin settings"
+	},
+	"localRestApiTest": {
+		"message": "Test Connection"
+	},
+	"localRestApiTestDescription": {
+		"message": "Test if the Local REST API connection is working"
+	},
+	"localRestApiTestSuccess": {
+		"message": "Connection successful!"
+	},
+	"localRestApiTestFailed": {
+		"message": "Connection failed"
+	},
+	"localRestApiTestFailedMessage": {
+		"message": "Connection failed: $1"
+	},
+	"testing": {
+		"message": "Testing..."
+	},
+	"testConnection": {
+		"message": "Test Connection"
+	},
 	"specificNoteName": {
 		"message": "Specific note name"
 	},

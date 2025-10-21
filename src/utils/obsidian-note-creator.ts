@@ -3,6 +3,7 @@ import { escapeDoubleQuotes, sanitizeFileName } from '../utils/string-utils';
 import { Template, Property } from '../types/types';
 import { generalSettings, incrementStat } from './storage-utils';
 import { copyToClipboard } from './clipboard-utils';
+import { createNoteViaLocalRestApi, isLocalRestApiAvailable } from './local-rest-api';
 
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
 	let frontmatter = '---\n';
@@ -102,6 +103,20 @@ export async function saveToObsidian(
 	vault: string,
 	behavior: Template['behavior'],
 ): Promise<void> {
+	// Try Local REST API first if enabled
+	if (await isLocalRestApiAvailable()) {
+		console.log('Attempting to save via Local REST API...');
+		const result = await createNoteViaLocalRestApi(fileContent, noteName, path, vault, behavior);
+
+		if (result.success) {
+			console.log('Successfully saved via Local REST API');
+			return;
+		} else {
+			console.warn('Local REST API failed, falling back to obsidian:// protocol:', result.error);
+		}
+	}
+
+	// Fallback to obsidian:// protocol
 	let obsidianUrl: string;
 
 	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';

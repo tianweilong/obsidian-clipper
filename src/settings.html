@@ -190,6 +190,58 @@
 										</div>
 									</div>
 								</div>
+							<div id="local-rest-api-section">
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<h3 data-i18n="localRestApiEnabled">Enable Local REST API</h3>
+										<div class="setting-item-description" data-i18n="localRestApiDescription">
+											Use the Local REST API plugin for silent note creation. Install the "Local REST API" plugin in Obsidian and configure it below. This will prevent Obsidian from being brought to the foreground.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="local-rest-api-toggle" />
+										</div>
+									</div>
+								</div>
+								<div id="local-rest-api-settings" class="local-rest-api-card" style="display: none;">
+									<div class="setting-item">
+										<div class="setting-item-info">
+											<label for="local-rest-api-url" data-i18n="localRestApiUrl">API URL</label>
+											<div class="setting-item-description" data-i18n="localRestApiUrlDescription">
+												The URL of your Local REST API server (default: http://localhost:27123)
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="text" id="local-rest-api-url" placeholder="http://localhost:27123" autocomplete="off" spellcheck="false" />
+										</div>
+									</div>
+
+									<div class="setting-item">
+										<div class="setting-item-info">
+											<label for="local-rest-api-key" data-i18n="localRestApiKey">API Key</label>
+											<div class="setting-item-description" data-i18n="localRestApiKeyDescription">
+												Your Local REST API key from Obsidian plugin settings
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="password" id="local-rest-api-key" placeholder="" autocomplete="off" spellcheck="false" />
+										</div>
+									</div>
+
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="test-local-rest-api-btn" data-i18n="localRestApiTest">Test Connection</label>
+											<div class="setting-item-description" data-i18n="localRestApiTestDescription">
+												Test if the Local REST API connection is working
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="test-local-rest-api-btn" class="mod-cta" data-i18n="testConnection">Test Connection</button>
+										</div>
+									</div>
+								</div>
+							</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="legacy-mode-toggle" data-i18n="legacyMode">Legacy&nbsp;mode</label>

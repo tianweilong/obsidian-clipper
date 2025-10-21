@@ -85,6 +85,9 @@ export interface Settings {
 	defaultPromptContext: string;
 	propertyTypes: PropertyType[];
 	readerSettings: ReaderSettings;
+	localRestApiEnabled: boolean;
+	localRestApiUrl: string;
+	localRestApiKey: string;
 	stats: {
 		addToObsidian: number;
 		saveFile: number;

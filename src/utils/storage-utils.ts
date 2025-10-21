@@ -29,6 +29,9 @@ export let generalSettings: Settings = {
 		theme: 'default',
 		themeMode: 'auto'
 	},
+	localRestApiEnabled: false,
+	localRestApiUrl: 'http://localhost:27123',
+	localRestApiKey: '',
 	stats: {
 		addToObsidian: 0,
 		saveFile: 0,
@@ -121,6 +124,9 @@ export async function loadSettings(): Promise<Settings> {
 			theme: 'default',
 			themeMode: 'auto'
 		},
+		localRestApiEnabled: false,
+		localRestApiUrl: 'http://localhost:27123',
+		localRestApiKey: '',
 		stats: {
 			addToObsidian: 0,
 			saveFile: 0,
@@ -173,6 +179,9 @@ export async function loadSettings(): Promise<Settings> {
 			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme,
 			themeMode: data.reader_settings?.themeMode as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.themeMode
 		},
+		localRestApiEnabled: (data.general_settings as any)?.localRestApiEnabled ?? defaultSettings.localRestApiEnabled,
+		localRestApiUrl: (data.general_settings as any)?.localRestApiUrl ?? defaultSettings.localRestApiUrl,
+		localRestApiKey: (data.general_settings as any)?.localRestApiKey ?? defaultSettings.localRestApiKey,
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
@@ -198,6 +207,9 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			silentOpen: generalSettings.silentOpen,
 			openBehavior: generalSettings.openBehavior,
 			saveBehavior: generalSettings.saveBehavior,
+			localRestApiEnabled: generalSettings.localRestApiEnabled,
+			localRestApiUrl: generalSettings.localRestApiUrl,
+			localRestApiKey: generalSettings.localRestApiKey,
 		},
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,

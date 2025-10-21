@@ -1,4 +1,4 @@
-import { Template, Property } from '../types/types';
+import { Template, Property, PathOption } from '../types/types';
 import { deleteTemplate, templates, editingTemplateIndex, saveTemplateSettings, setEditingTemplateIndex, loadTemplates } from './template-manager';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, unescapeValue } from '../utils/string-utils';
@@ -176,8 +176,8 @@ export function showTemplateEditor(template: Template | null): void {
 	if (templateName) templateName.value = editingTemplate.name;
 	if (templateProperties) templateProperties.textContent = '';
 
-	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) pathInput.value = editingTemplate.path || '';
+	// Render paths list
+	renderPathsList(editingTemplate);
 
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
@@ -490,8 +490,8 @@ export function updateTemplateFromForm(): void {
 
 	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 
-	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) template.path = pathInput.value;
+	// Save paths from the paths list
+	savePathsFromForm(template);
 
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	if (noteNameFormat) {
@@ -542,8 +542,11 @@ function clearTemplateEditor(): void {
 	if (templateEditorTitle) templateEditorTitle.textContent = getMessage('newTemplate');
 	if (templateName) templateName.value = '';
 	if (templateProperties) templateProperties.textContent = '';
-	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) pathInput.value = 'Clippings';
+
+	// Clear paths list
+	const pathsList = document.getElementById('template-paths-list');
+	if (pathsList) pathsList.textContent = '';
+
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (triggersTextarea) triggersTextarea.value = '';
 	const templateEditor = document.getElementById('template-editor');
@@ -609,4 +612,150 @@ function updatePropertyNameSuggestions(): void {
 
 export function refreshPropertyNameSuggestions(): void {
 	updatePropertyNameSuggestions();
+}
+
+// Multiple paths management functions
+function renderPathsList(template: Template): void {
+	const pathsList = document.getElementById('template-paths-list');
+	if (!pathsList) return;
+
+	pathsList.textContent = '';
+
+	// Initialize paths array if it doesn't exist
+	if (!template.paths || template.paths.length === 0) {
+		// Migrate from old single path to new paths array
+		template.paths = [{
+			id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
+			name: 'Default',
+			path: template.path || 'Clippings'
+		}];
+	}
+
+	// Render each path
+	template.paths.forEach((pathOption, index) => {
+		const pathItem = createPathItem(pathOption, index);
+		pathsList.appendChild(pathItem);
+	});
+
+	initializeIcons(pathsList);
+}
+
+function createPathItem(pathOption: PathOption, index: number): HTMLElement {
+	const pathItem = createElementWithClass('div', 'path-item');
+	pathItem.dataset.id = pathOption.id;
+	pathItem.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px; align-items: center;';
+
+	// Path name input
+	const nameInput = createElementWithHTML('input', '', {
+		type: 'text',
+		class: 'path-name-input',
+		value: pathOption.name,
+		placeholder: 'Path name',
+		style: 'flex: 0 0 120px;'
+	}) as HTMLInputElement;
+
+	// Path value input
+	const pathInput = createElementWithHTML('input', '', {
+		type: 'text',
+		class: 'path-value-input',
+		value: pathOption.path,
+		placeholder: 'Clippings',
+		style: 'flex: 1;'
+	}) as HTMLInputElement;
+
+	// Delete button
+	const deleteBtn = createElementWithClass('button', 'delete-path-btn clickable-icon');
+	deleteBtn.setAttribute('type', 'button');
+	deleteBtn.setAttribute('aria-label', 'Delete path');
+	deleteBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+
+	// Add event listeners
+	nameInput.addEventListener('input', () => {
+		updateTemplateFromForm();
+	});
+
+	pathInput.addEventListener('input', () => {
+		updateTemplateFromForm();
+	});
+
+	deleteBtn.addEventListener('click', () => {
+		if (editingTemplateIndex === -1) return;
+		const template = templates[editingTemplateIndex];
+		if (!template || !template.paths) return;
+
+		// Don't allow deleting the last path
+		if (template.paths.length <= 1) {
+			alert('You must have at least one path.');
+			return;
+		}
+
+		template.paths = template.paths.filter(p => p.id !== pathOption.id);
+		renderPathsList(template);
+		updateTemplateFromForm();
+	});
+
+	pathItem.appendChild(nameInput);
+	pathItem.appendChild(pathInput);
+	pathItem.appendChild(deleteBtn);
+
+	return pathItem;
+}
+
+function savePathsFromForm(template: Template): void {
+	const pathItems = document.querySelectorAll('#template-paths-list .path-item');
+
+	template.paths = Array.from(pathItems).map(item => {
+		const nameInput = item.querySelector('.path-name-input') as HTMLInputElement;
+		const pathInput = item.querySelector('.path-value-input') as HTMLInputElement;
+		return {
+			id: (item as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+			name: nameInput.value || 'Default',
+			path: pathInput.value || 'Clippings'
+		};
+	}).filter(p => p.path.trim() !== '');
+
+	// Update the default path field for backward compatibility
+	if (template.paths.length > 0) {
+		template.path = template.paths[0].path;
+	}
+}
+
+export function initializeAddPathButton(): void {
+	const addPathBtn = document.getElementById('add-path-btn');
+	if (addPathBtn) {
+		addPathBtn.removeEventListener('click', handleAddPath);
+		addPathBtn.addEventListener('click', handleAddPath);
+	}
+}
+
+function handleAddPath(): void {
+	if (editingTemplateIndex === -1) return;
+	const template = templates[editingTemplateIndex];
+	if (!template) return;
+
+	if (!template.paths) {
+		template.paths = [];
+	}
+
+	const newPath: PathOption = {
+		id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
+		name: `Path ${template.paths.length + 1}`,
+		path: ''
+	};
+
+	template.paths.push(newPath);
+	renderPathsList(template);
+	updateTemplateFromForm();
+
+	// Focus on the new path input
+	const pathsList = document.getElementById('template-paths-list');
+	if (pathsList) {
+		const lastPathItem = pathsList.lastElementChild;
+		if (lastPathItem) {
+			const pathInput = lastPathItem.querySelector('.path-value-input') as HTMLInputElement;
+			if (pathInput) {
+				pathInput.focus();
+			}
+		}
+	}
 }

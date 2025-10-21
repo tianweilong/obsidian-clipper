@@ -510,9 +510,12 @@
 									<input type="text" id="note-name-format" placeholder="{{title}}" />
 								</div>
 								<div class="setting-item" id="path-name-container" style="display: none;">
-									<label for="template-path-name" data-i18n="noteLocation">Note location</label>
-									<div class="setting-item-description" data-i18n="noteLocationDescription">The folder or path of the note.</div>
-									<input type="text" id="template-path-name" placeholder="Clippings" />
+									<label data-i18n="noteLocation">Note location</label>
+									<div class="setting-item-description" data-i18n="noteLocationDescription">The folder or path of the note. Add multiple paths for selection during clipping.</div>
+									<div id="template-paths-list"></div>
+									<button type="button" id="add-path-btn" class="mod-cta" style="margin-top: 8px;">
+										<span data-i18n="addPath">Add path</span>
+									</button>
 								</div>
 								<div class="setting-item">
 									<label for="template-vault" data-i18n="vault">Vault</label>

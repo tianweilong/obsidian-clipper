@@ -1,9 +1,16 @@
+export interface PathOption {
+	id: string;
+	name: string;
+	path: string;
+}
+
 export interface Template {
 	id: string;
 	name: string;
 	behavior: 'create' | 'append-specific' | 'append-daily' | 'prepend-specific' | 'prepend-daily' | 'overwrite';
 	noteNameFormat: string;
-	path: string;
+	path: string; // Keep for backward compatibility, will be the default path
+	paths?: PathOption[]; // Multiple path options
 	noteContentFormat: string;
 	properties: Property[];
 	triggers?: string[];

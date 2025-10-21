@@ -11,6 +11,9 @@
 	"addProperty": {
 		"message": "+ 添加属性"
 	},
+	"addPath": {
+		"message": "+ 添加路径"
+	},
 	"addProvider": {
 		"message": "+ 添加提供商"
 	},

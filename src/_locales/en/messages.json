@@ -11,6 +11,9 @@
 	"addProperty": {
 		"message": "+ Add property"
 	},
+	"addPath": {
+		"message": "+ Add path"
+	},
 	"addProvider": {
 		"message": "+ Add provider"
 	},

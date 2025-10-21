@@ -871,6 +871,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	}
 
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+	const pathSelect = document.getElementById('path-select') as HTMLSelectElement;
 	const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
 	
 	if (pathField && pathContainer) {
@@ -878,11 +879,49 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		
 		if (isDailyNote) {
 			pathField.style.display = 'none';
+			if (pathSelect) pathSelect.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
-			pathField.value = formattedPath;
-			pathField.setAttribute('data-template-value', template.path);
+
+			// Handle multiple paths
+			if (template.paths && template.paths.length > 1) {
+				// Show path selector dropdown
+				if (pathSelect) {
+					pathSelect.style.display = 'block';
+					pathSelect.innerHTML = '';
+
+					// Populate path options
+					for (const pathOption of template.paths) {
+						const option = document.createElement('option');
+						option.value = pathOption.id;
+						option.textContent = pathOption.name;
+						option.dataset.path = pathOption.path;
+						pathSelect.appendChild(option);
+					}
+
+					// Handle path selection change
+					pathSelect.onchange = async () => {
+						const selectedOption = pathSelect.options[pathSelect.selectedIndex];
+						const selectedPath = selectedOption.dataset.path || '';
+						const formattedPath = await memoizedCompileTemplate(currentTabId!, selectedPath, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+						pathField.value = formattedPath;
+						pathField.setAttribute('data-template-value', selectedPath);
+					};
+
+					// Set initial value from first path
+					const firstPath = template.paths[0].path;
+					let formattedPath = await memoizedCompileTemplate(currentTabId!, firstPath, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+					pathField.value = formattedPath;
+					pathField.setAttribute('data-template-value', firstPath);
+				}
+			} else {
+				// Single path or legacy template
+				if (pathSelect) pathSelect.style.display = 'none';
+				const pathToUse = (template.paths && template.paths.length > 0) ? template.paths[0].path : template.path;
+				let formattedPath = await memoizedCompileTemplate(currentTabId!, pathToUse, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+				pathField.value = formattedPath;
+				pathField.setAttribute('data-template-value', pathToUse);
+			}
 		}
 	}
 

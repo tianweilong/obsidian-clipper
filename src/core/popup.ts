@@ -955,12 +955,8 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
 					}
 					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '', modelConfig);
-					
-					// Ensure the button shows the completed state after auto-run
-					if (interpretBtn) {
-						interpretBtn.classList.add('done');
-						interpretBtn.disabled = true;
-					}
+
+					// Note: handleInterpreterUI already sets the button state, no need to override here
 				} catch (error) {
 					console.error('Error auto-processing with interpreter:', error);
 					const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;

@@ -106,13 +106,12 @@
 			}
 		}
 		&.done {
-			pointer-events: none;
-			cursor: default;
+			cursor: pointer;
 			color: var(--text-success);
 			opacity: 1;
 			@media (hover: hover) {
 				&:hover {
-					color: var(--text-success);
+					color: var(--color-accent-3);
 				}
 			}
 			~ {
@@ -122,13 +121,12 @@
 			}
 		}
 		&.error {
-			pointer-events: none;
-			cursor: default;
+			cursor: pointer;
 			color: var(--text-error);
 			opacity: 1;
 			@media (hover: hover) {
 				&:hover {
-					color: var(--text-error);
+					color: var(--color-accent-3);
 				}
 			}
 			~ {

@@ -14,6 +14,12 @@ let lastRequestTime = 0;
 // Store event listeners for cleanup
 const eventListeners = new WeakMap<HTMLElement, { [key: string]: EventListener }>();
 
+// Store original input values before LLM processing
+const originalInputValues = new Map<string, string>();
+
+// Store active timer interval to allow cleanup on re-execution
+let activeTimerInterval: number | null = null;
+
 export async function sendToLLM(promptContext: string, content: string, promptVariables: PromptVariable[], model: ModelConfig): Promise<{ promptResponses: any[] }> {
 	debugLog('Interpreter', 'Sending request to LLM...');
 	
@@ -458,9 +464,10 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 	}
 
 	if (template) {
-		// Only add click listener if auto-run is disabled
-		if (interpretBtn && !generalSettings.interpreterAutoRun) {
+		// Always add click listener to allow re-execution
+		if (interpretBtn) {
 			const clickListener = async () => {
+				debugLog('Interpreter', 'Button clicked!');
 				const selectedModelId = modelSelect.value;
 				const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
 				if (!modelConfig) {
@@ -469,6 +476,7 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 				await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
 			};
 			storeListener(interpretBtn, 'click', clickListener);
+			debugLog('Interpreter', 'Click listener registered for interpret button');
 		}
 
 		if (modelSelect) {
@@ -524,6 +532,47 @@ export async function handleInterpreterUI(
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 
 	try {
+		// Clear any existing timer from previous execution
+		if (activeTimerInterval !== null) {
+			clearInterval(activeTimerInterval);
+			activeTimerInterval = null;
+		}
+
+		// Check if we need to restore original values (re-execution)
+		const isReExecution = interpreterContainer?.classList.contains('done') || interpreterContainer?.classList.contains('error');
+
+		if (isReExecution) {
+			// Restore original input values
+			const allInputs = document.querySelectorAll('input, textarea');
+			allInputs.forEach((input) => {
+				if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+					const inputId = input.id || input.name || '';
+					const originalValue = originalInputValues.get(inputId);
+					if (originalValue !== undefined) {
+						input.value = originalValue;
+
+						// Adjust height for noteNameField after restoring value
+						if (input.id === 'note-name-field' && input instanceof HTMLTextAreaElement) {
+							adjustNoteNameHeight(input);
+						}
+					}
+				}
+			});
+		} else {
+			// Save original input values before first execution
+			originalInputValues.clear();
+			const allInputs = document.querySelectorAll('input, textarea');
+			allInputs.forEach((input) => {
+				if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+					const inputId = input.id || input.name || '';
+					// Only save if the input contains prompt variables
+					if (input.value.includes('{{prompt:') || input.value.includes('{{\"')) {
+						originalInputValues.set(inputId, input.value);
+					}
+				}
+			});
+		}
+
 		// Hide any previous error message
 		interpreterErrorMessage.style.display = 'none';
 		interpreterErrorMessage.textContent = '';
@@ -553,7 +602,6 @@ export async function handleInterpreterUI(
 
 		// Start the timer
 		const startTime = performance.now();
-		let timerInterval: number;
 
 		// Change button text and add class
 		interpretBtn.textContent = getMessage('thinking');
@@ -567,8 +615,8 @@ export async function handleInterpreterUI(
 		responseTimer.style.display = 'inline';
 		responseTimer.textContent = '0ms';
 
-		// Update the timer text with elapsed time
-		timerInterval = window.setInterval(() => {
+		// Update the timer text with elapsed time and store the interval
+		activeTimerInterval = window.setInterval(() => {
 			const elapsedTime = performance.now() - startTime;
 			responseTimer.textContent = formatDuration(elapsedTime);
 		}, 10);
@@ -577,16 +625,19 @@ export async function handleInterpreterUI(
 		debugLog('Interpreter', 'LLM response:', { promptResponses });
 
 		// Stop the timer and update UI
-		clearInterval(timerInterval);
+		if (activeTimerInterval !== null) {
+			clearInterval(activeTimerInterval);
+			activeTimerInterval = null;
+		}
 		const endTime = performance.now();
 		const totalTime = endTime - startTime;
 		responseTimer.textContent = formatDuration(totalTime);
 
-		// Update button state
-		interpretBtn.textContent = getMessage('done').toLowerCase();
+		// Update button state - allow re-execution
+		interpretBtn.textContent = getMessage('interpret');
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('done');
-		interpretBtn.disabled = true;
+		interpretBtn.disabled = false;
 
 		// Add done class to container
 		interpreterContainer?.classList.add('done');
@@ -606,12 +657,18 @@ export async function handleInterpreterUI(
 
 	} catch (error) {
 		console.error('Error processing LLM:', error);
-		
-		// Revert button text and remove class in case of error
-		interpretBtn.textContent = getMessage('error');
+
+		// Stop the timer in case of error
+		if (activeTimerInterval !== null) {
+			clearInterval(activeTimerInterval);
+			activeTimerInterval = null;
+		}
+
+		// Revert button text and allow re-execution even on error
+		interpretBtn.textContent = getMessage('interpret');
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('error');
-		interpretBtn.disabled = true;
+		interpretBtn.disabled = false;
 
 		// Add error class to interpreter container
 		interpreterContainer?.classList.add('error');

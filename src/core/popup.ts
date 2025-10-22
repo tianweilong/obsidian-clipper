@@ -945,7 +945,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			const promptVariables = collectPromptVariables(template);
 
 			// If auto-run is enabled and there are prompt variables, use interpreter
-			if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
+			if (generalSettings.interpreterAutoRun && promptVariables.length > 0 && noteContentField.value.trim()) {
 				try {
 					const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 					const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
